@@ -1,0 +1,60 @@
+%!TEX root = dmab.tex
+
+% packages
+\usepackage{amsthm,amsmath,amssymb}
+\usepackage{xcolor}
+
+
+% comments, etc
+\newcommand{\ignore}[1]{}
+\newcommand{\tk}[1]{\noindent{\textcolor{cyan}{\{{\bf TK:} \em #1\}}}}
+\newcommand{\zk}[1]{\noindent{\textcolor{magenta}{\{{\bf ZK:} \em #1\}}}}
+\newcommand{\eh}[1]{\noindent{\textcolor{violet}{\{{\bf EH:} \em #1\}}}}
+\newcommand{\rl}[1]{\noindent{\textcolor{red}{\{{\bf RL:} \em #1\}}}}
+
+% theorems
+\newtheorem{theorem}{Theorem}[section]
+
+\newtheorem{lemma}[theorem]{Lemma}
+\newtheorem{corollary}[theorem]{Corollary}
+\newtheorem{definition}[theorem]{Definition}
+\newtheorem{claim}[theorem]{Claim}
+\newtheorem{fact}[theorem]{Fact}
+
+\newtheorem*{theorem*}{Theorem}
+\newtheorem*{lemma*}{Lemma}
+\newtheorem*{corollary*}{Corollary}
+\newtheorem*{definition*}{Definition}
+\newtheorem*{claim*}{Claim}
+\newtheorem*{fact*}{Fact}
+
+% style defs
+\renewcommand{\le}{\leqslant}
+\renewcommand{\ge}{\geqslant}
+\renewcommand{\leq}{\le}
+\renewcommand{\geq}{\ge}
+
+% command definitions
+\newcommand{\eps}{\varepsilon}
+\newcommand{\del}{\delta}
+\newcommand{\Del}{\Delta}
+\renewcommand{\O}{O}
+\newcommand{\OO}[1]{\O\left(#1\right)}
+\newcommand{\tO}{\tilde{\O}}
+\newcommand{\E}{\mathbf{E}}
+\newcommand{\EE}[1]{\E\left[#1\right]}
+% shorthand for clipping (max)
+\newcommand{\mx}[2]{[#1]_{#2}}
+\newcommand{\maxe}[1]{\mx{#1}{\eps}}
+
+
+\newcommand{\phat}{\hat{p}}
+\newcommand{\qhat}{\hat{q}}
+\newcommand{\Dele}{\Del^{\eps}}
+\newcommand{\Delst}{\Del_{\st}}
+
+\newcommand{\abs}[1]{|#1|}
+\newcommand{\ceil}[1]{\lceil#1\rceil}
+
+
+\newcommand{\st}{\star}

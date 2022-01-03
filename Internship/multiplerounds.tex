@@ -1,0 +1,275 @@
+%!TEX root = dmab.tex
+
+\section{Multiple Communication Rounds}
+\label{sec:multiplerounds}
+
+
+This section establishes a general dependence of communication on
+$1/\eps$, and shows a tradeoff between the sample complexity of a multi-player
+algorithm and the number of communication rounds it uses, in terms of~$1/\eps$.
+
+
+
+\subsection{$\O(\log(1/\eps))$-rounds Algorithm}
+
+We first show that by allowing $\O(\log(1/\eps))$ rounds of communication, we are able to attain the optimal sample complexity as in the single-player scenario.
+That is, we do not gain any improvement in learning performace from allowing more than $\O(\log(1/\eps))$ rounds.
+
+Our algorithm is based on a variant of Successive Elimination. The idea is to eliminate in each round $r$ (i.e., right after the $r$th communication round) all $2^{-r}$-suboptimal arms.
+We accomplish that by letting each player sample uniformly all remaining arms and communicate the results to other players. Then, players are able to eliminate suboptimal arms with high confidence.
+If each such round is successful, after $\log_2(1/\eps)$ rounds only the best arm survives.
+The algorithm is given in detail as Algorithm~\ref{alg:algname} below, and in Theorem \ref{thm:main1} we state its sample complexity guarantee.
+
+
+\begin{algorithm} \caption{\textsc{Multi-Player SE}} \label{alg:algname}
+\begin{algorithmic}[1]
+
+\INPUT{$(\eps,\del)$}
+\OUTPUT{an arm}
+
+\STATE define $\eps_r = 2^{-r}$
+
+\STATE let $t_0 = 0$ and
+$
+%	t_0 = 0 ,
+%	\quad\text{and}\quad
+	t_r = (2/k\eps_r^2) \ln (4 n r^2/\del)
+%	\quad
+%	(r=1,2,\ldots)
+$
+for $r \ge 1$
+
+\STATE initialize $S_0 \gets [n]$, $r \gets 0$
+
+\REPEAT
+	\STATE set $r \gets r+1$
+	\FOR {player $j=1$ to $k$}
+		\STATE sample each arm $i \in S_{r-1}$  for $t_r - t_{r-1}$ times
+		\STATE let $\phat_{j,i}^r$ be the average reward of arm $i$ (in all rounds
+		so far of player $j$) 
+		\STATE communicate the numbers $\phat_{j,1}^r, \ldots,
+		\phat_{j,n}^r$
+	\ENDFOR
+	
+	\STATE let $\phat_i^r = (1/k) \sum_{j=1}^k \phat_{j,i}^r$ for all $i \in S_{r-1}$,
+		and let $\phat_{\st}^r = \max_{i \in S_{r-1}} \phat_i^r$
+	\STATE set 
+		$
+		S_r \gets S_{r-1} \setminus 
+		\{i \in S_{r-1} : \phat_i^r < \phat_{\st}^r - \eps_r\}
+		$
+\UNTIL {$\eps_r \le \eps/2$ or $\abs{S_r} = 1$}
+
+\STATE output $S_r$
+
+\end{algorithmic}
+\end{algorithm}
+
+
+
+\begin{theorem} \label{thm:main1}
+
+With probability at least $1-\del$, Algorithm \ref{alg:algname}
+\begin{itemize}
+\item
+identifies the optimal arm using
+\begin{align*}
+	\OO{\sum_{i=2}^{n}
+		\frac{1}{(\Dele_i)^2} \log \left(\frac{n}{\del} \log \frac{1}{\Dele_i}\right)
+	}
+\end{align*}
+arm pulls;
+\item
+terminates after at most $1+\ceil{\log_2(1/\eps)}$ rounds of communication (or after $1+\ceil{\log_2(1/\Del)}$ rounds for $\eps=0$).
+\end{itemize}
+
+\end{theorem}
+
+
+
+
+
+\begin{proof}
+Without loss of generality, we may assume that the rewards of all arms are drawn before the algorithm is executed, so that the empirical averages $\phat_i^r$ are defined for all arms at all rounds (even for arms that were eliminated prior to some round).
+Since $\phat_i^r$ is the empirical average of $k t_r$ samples of arm $i$ (aggregated from all players),
+for any round $r$ and arm $i$ we have by Hoeffding's inequality,
+\begin{align*}
+	\Pr[\abs{\phat_i^r - p_i} \ge \eps_r/2]
+	\le 2 \exp(-\eps_r^2 k t_r/2)
+	= \del / 2n r^2 \,.
+\end{align*}
+%\rl{where was $\del_r$ defined?} \tk{typo - fixed}
+Hence, a union bound gives that $\abs{\phat_i^r - p_i} < \eps_r/2$ for all $i$ and $r$ with probability at least
+\begin{align*}
+	1 - \sum_{r=1}^{\infty} \sum_{i=1}^{n} \frac{\del}{2n r^2}
+	= 1 - \sum_{r=1}^{\infty} \frac{\del}{2 r^2}
+	\ge 1-\del \,.
+\end{align*}
+That is, with probability at least $1-\del$, an $\eps$-optimal arm $i$ is never eliminated by the algorithm, as the event $\phat_i^r < \phat_{\st}^r - \eps_r$ implies that either $\phat_i^r < p_i - \eps_r/2$ or $\phat_j^r > p_j + \eps_r/2$ for some arm $j$.
+In addition, any suboptimal arm $i$ does not survive round $r_i = \ceil{\log_2(1/\Dele_i)} + 1$, since $\Dele_i \ge 2 \eps_{r_i}$ and so for $r = r_i$,
+%In addition, any arm $i$ with $\Del_i \ge 2\eps_r$ does not survive round $r$, since
+\begin{align*}
+	\phat_i^{r}
+	&< p_i + \eps_{r}/2 
+	= p_1 + \eps_{r}/2 - \Del_i 
+	\le \phat_1^{r} + \eps_{r} - \Del_i \\
+	&\le \phat_1^{r} - \eps_{r} 
+	\le \phat_\st^{r} - \eps_{r} \,.
+\end{align*}
+That is, with probability at least $1-\del$, after $\ceil{\log_2(1/\eps)} + 1$ rounds (when the algorithm terminates) all remaining arms are $\eps$-optimal.  
+When $\eps=0$, the algorithm terminates once only a single arm survives, and with high probability this occurs after at most $\ceil{\log_2(1/\Del)} + 1$ rounds.
+
+%That is, with probability at least $1-\del$ the algorithm terminates after $\ceil{\log_2(1/\eps)} + 1$ rounds and returns an $\eps$-optimal.
+
+We conclude by computing the sample complexity. 
+Let $T_i$ be the total number of times arm~$i \ne 1$ is pulled.
+Since $r_i \le \log_2(4/\Dele_i)$, we have 
+\begin{align*}
+	T_i 
+	&\le 2 (2^{r_i})^2 \ln \frac{4n r_i^2}{\del} \\
+	&\le 2 \left( \frac{4}{\Dele_i} \right)^2 
+		\ln \left( \frac{4n}{\del} \log_2^2 \frac{4}{\Dele_i} \right) \\
+	&= \OO{\frac{1}{(\Dele_i)^2} \log \left(\frac{n}{\del} \log \frac{1}{\Dele_i}\right)} .
+\end{align*}
+Consequently, the total number of arm pulls is $T_2 + \sum_{i=2}^{n} T_i$, which gives the theorem.
+\end{proof}
+
+
+
+
+
+%\begin{lemma}
+%With probability at least $1-\del/n$, the optimal arm is not eliminated by the algorithm.
+%\end{lemma}
+%
+%\begin{proof}
+%Consider round $r$, assuming that the best arm survived previous rounds.
+%Let $j = \arg \max_{i \in S_r} \phat_i$ for which $\phat_j = \phat_{\max}$.
+%We have 
+%\begin{align*}
+%	\Pr[\phat_1 < \phat_{\max} - \eps_r/2]
+%	&= \Pr[\phat_{\max} - p_1 + p_1 - \phat_1 > \eps_r/2] \\
+%	&\le \Pr[\phat_{\max} - p_j + p_1 - \phat_1 > \eps_r/2] \\
+%	&\le \exp(-4 (\eps_r/4)^2 t_r) \\
+%	&= \del/(2n r^2) .
+%\end{align*}
+%Taking a union bound over $r=1,2,\ldots$, we conclude that the optimal arm is eliminated with probability at most
+%$
+%	\sum_{r=1}^{\infty} \del/(2n r^2)
+%	< \del/n .
+%$
+%\end{proof}
+%
+%
+%
+%
+%
+%\begin{lemma}
+%Assume that the optimal arm is not eliminated by the algorithm, and consider some arm $i$ with $\Del_i \ge \eps_r$.
+%Then with probability at least $1-\del/n$, arm $i$ is eliminated in the first $r$ rounds.
+%\end{lemma}
+%
+%\begin{proof}
+%Consider round $r$, assuming that arm $i$ was not eliminated in previous rounds.
+%Note that $p_i = p_1 - \Del_i \le p_1 - \eps_r$.
+%We have
+%\begin{align*}
+%	\Pr[\phat_i \ge \phat_{\max} - \eps_r/2]
+%	&\le \Pr[\phat_i - p_i + p_1 - \phat_{\max} \ge \eps_r/2] \\
+%	&\le \Pr[\phat_i - p_i + p_1 - \phat_1 \ge \eps_r/2] \\
+%	&\le \exp(-4 (\eps_r/4)^2 t_r) \\
+%	&\le \del/n .
+%\end{align*}
+%Hence, with probability $\ge 1-\del/n$, arm $i$ does not survive round $r$.
+%\end{proof}
+%
+%
+%
+%
+%We are now ready to prove Theorem \ref{thm:main1}.
+%
+%\begin{proof}
+%From the above lemmas (and by a union bound), we see that the algorithm eliminates all suboptimal arms while keeping the best one with probability at least $1-\del$. 
+%Also, let $r_i = \ceil{\log_2(1/\Del_i)}$ and note that by the above lemma, if the algorithm is successful, each suboptimal arm $i$ survives at most $r_i$ rounds. This means that $\ceil{\log_2(1/\Del)} \le 1+\log_2(1/\Del)$ rounds are sufficient for terminating the algorithm, with high probability.
+%
+%Finally, we compute the sample complexity. 
+%Let $T_i$ be the total number of times arm~$i \ne 1$ is pulled.
+%Recalling that $r_i \le \log_2(2/\Del_i)$, we have 
+%\begin{align*}
+%	T_i 
+%	&\le 4 (2^{r_i})^2 \log \frac{2n r_i^2}{\del}
+%	\le 4 \left( \frac{2}{\Del_i} \right)^2 
+%		\log \left( \frac{2n}{\del} \log_2^2 \frac{2}{\Del_i} \right) \\
+%	&= \OO{\frac{1}{\Del_i^2} \log \left(\frac{n}{\del} \log \frac{1}{\Del_i}\right)} .
+%\end{align*}
+%Consequently, with probability at least $1-\del$ the total number of arm pulls is $T_2 + \sum_{i=2}^{n} T_i$, which gives the theorem.
+%\end{proof}
+
+
+
+
+\subsection{$R$-rounds Algorithm}
+
+%\eh{either add the algorithm or explicitly define which lines in
+%algorithm~\ref{alg:algname} are replaced and with what, otherwise it is hard to
+%follow}  \rl{fully agree with Eshcar's comment.}
+%\tk{precise details are given in the theorem below -- this paragraph only gives an overview of the subsection}
+
+By properly tuning the elimination thresholds $\eps_r$ of Algorithm
+\ref{alg:algname} in accordance with the target accuracy $\eps$, we can trade
+off between the number of communication rounds and the sample complexity of the
+algorithm.   
+In particular, we can design a multi-player algorithm that terminates after at
+most $R$ communication rounds, for any given parameter $R>0$.
+%\eh{$R>1$ ? if not explain why this does not contradicts the lower bound when $24c/\sqrt{k} > 1/\eps^2$}.  \tk{I don't think we gain anything from getting into this discussion (unless a reviewer demands it...) }
+This, however, comes at the cost of a compromise in sample complexity as quantified in the following theorem.
+
+
+\begin{theorem} \label{thm:main3}
+Given a parameter $R > 0$, set $\eps_r = \eps^{r/R}$ for all $r \ge 0$ in Algorithm \ref{alg:algname}.
+With probability at least $1-\del$, the modified algorithm%
+\footnote{In contrast to other algorithms discussed in this paper, this
+algorithm does not apply to $\eps=0$. In order to apply it in a best-arm
+identification setting, one should set $0<\eps\le\Del$, but this would require
+knowing the value of $\Del$ (or some lower bound thereof) beforehand. }  
+\begin{itemize}
+\item
+identifies an $\eps$-optimal arm using
+\begin{align*}
+	\OO{
+		\frac{1}{\eps^{2/R}}
+		\cdot
+		\sum_{i=2}^{n} \frac{1}{(\Dele_i)^2}
+		\log \frac{n R}{\del}
+	}
+\end{align*}
+arm pulls;
+\item
+terminates after at most $R$ rounds of communication.
+\end{itemize}
+\end{theorem}
+
+
+
+\begin{proof}
+For all arms $i \in [n]$, let
+\begin{align*}
+	r_i = \left\lceil
+		R \, \frac{1+\log_2 (1/\Dele_i)}{\log_2 (1/\eps)}
+	\right\rceil .
+\end{align*}
+Since $\Del_i \ge 2\eps_{r_i}$, if the algorithm is successful any arm $i$ which is not $\eps_{r_i}$-optimal is eliminated after at most $r_i$ rounds.
+Clearly, after $R$ rounds only $\eps$-optimal arms survive.
+This happens with probability at least $1-\del$.
+
+It remains to calculate the sample complexity. 
+It is easy to verify that $2\eps_{r_i} \ge \eps^{1/R} \cdot \Dele_i$, thus the number of times arm $i$ was pulled is
+\begin{align*}
+	T_i 
+	= \frac{4}{\eps_{r_i}^2} \ln \frac{2n r_i^2}{\del}
+	= \OO{
+		\frac{1}{\eps^{2/R}} \cdot \frac{1}{(\Dele_i)^2} \log \frac{n R}{\del}
+	} ,
+\end{align*}
+and the theorem follows.
+\end{proof}

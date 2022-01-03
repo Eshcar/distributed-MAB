@@ -1,0 +1,16 @@
+%!TEX root = dmab.tex
+
+\section{Conclusions and Future Work} \label{sec:conc}
+
+%Motivated by recent web-scale applications of MAB models, \tk{no space for that - leave to camera ready}
+We have considered a multi-player multi-armed bandits problem, where arms are pulled, and rewards are observed, by several independent players with a common goal. 
+In order to learn efficiently, the players must communicate. 
+We show an inherent tradeoff between the communication among the players, and the overall number of arm pulls required to solve the problem (less communication implies more arm pulls). 
+
+We leave the following for future work. 
+Most importantly, we wish to translate our findings to the regret minimization setting.
+Furthermore, it would be interesting to extend our single-round results to the case where $r$ communication rounds are allowed, for any constant $r>1$. 
+Specifically, we would like to quantify the communication-pulls tradeoff in terms of the number of players $k$ (and independently of $\eps$). 
+Finally, we wish to investigate lower bounds on arm pulls for the case of multiple rounds of communication. 
+%Third, while this work focused on measuring communication between players by the notion of rounds of communication with unbounded messages, it is challenging to quantify communication in bits. 
+%This could entail both bounding the worst case and minimizing the expected amount of communication within each round. 

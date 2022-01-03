@@ -1,0 +1,107 @@
+\begin{thebibliography}{16}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Agarwal et~al.(2008)Agarwal, Chen, Elango, Motgi, Park, Ramakrishnan,
+  Roy, and Zachariah]{COKE2008}
+Deepak Agarwal, Bee-Chung Chen, Pradheep Elango, Nitin Motgi, Seung-Taek Park,
+  Raghu Ramakrishnan, Scott Roy, and Joe Zachariah.
+\newblock Online models for content optimization.
+\newblock In \emph{Proc. 22nd Annual Conference on Neural Information
+  Processing Systems (NIPS'2008)}, pages 17--24, December 2008.
+
+\bibitem[Agarwal et~al.(2009)Agarwal, Chen, and Elango]{COKE2009}
+Deepak Agarwal, Bee-Chung Chen, and Pradheep Elango.
+\newblock Explore/exploit schemes for web content optimization.
+\newblock In \emph{Proc. Ninth IEEE International Conference on Data Mining
+  (ICDM'2009)}, pages 1--10, 2009.
+
+\bibitem[Anthony and Bartlett(1999)]{anthony1999neural}
+M.~Anthony and P.~Bartlett.
+\newblock \emph{Neural network learning: Theoretical foundations}.
+\newblock Cambridge University Press, 1999.
+
+\bibitem[Audibert et~al.(2010)Audibert, Bubeck, and Munos]{audibert10}
+Jean-Yves Audibert, S{\'e}bastien Bubeck, and R{\'e}mi Munos.
+\newblock Best arm identification in multi-armed bandits.
+\newblock In \emph{COLT}, pages 41--53, 2010.
+
+\bibitem[Auer et~al.(2002)Auer, Cesa-Bianchi, and Fischer]{auer2002finite}
+P.~Auer, N.~Cesa-Bianchi, and P.~Fischer.
+\newblock Finite-time analysis of the multiarmed bandit problem.
+\newblock \emph{Machine learning}, 47\penalty0 (2):\penalty0 235--256, 2002.
+
+\bibitem[Balcan et~al.(2012)Balcan, Blum, Fine, and Mansour]{balcan12}
+M.F. Balcan, A.~Blum, S.~Fine, and Y.~Mansour.
+\newblock Distributed learning, communication complexity and privacy.
+\newblock \emph{Arxiv preprint arXiv:1204.3514}, 2012.
+
+\bibitem[Bubeck et~al.(2009)Bubeck, Munos, and Stoltz]{bubeck2009pure}
+S.~Bubeck, R.~Munos, and G.~Stoltz.
+\newblock Pure exploration in multi-armed bandits problems.
+\newblock In \emph{Algorithmic Learning Theory}, pages 23--37. Springer, 2009.
+
+\bibitem[Chakrabarti et~al.(2008)Chakrabarti, Kumar, Radlinski, and
+  Upfal]{COKE-mortal2008}
+Deepayan Chakrabarti, Ravi Kumar, Filip Radlinski, and Eli Upfal.
+\newblock Mortal multi-armed bandits.
+\newblock In \emph{Proc. 22nd Annual Conference on Neural Information
+  Processing Systems (NIPS'2008)}, pages 273--280, 2008.
+
+\bibitem[Even-Dar et~al.(2002)Even-Dar, Mannor, and Mansour]{evendar02}
+E.~Even-Dar, S.~Mannor, and Y.~Mansour.
+\newblock {PAC} bounds for multi-armed bandit and markov decision processes.
+\newblock In \emph{COLT}, pages 193--209. Springer, 2002.
+
+\bibitem[Even-Dar et~al.(2006)Even-Dar, Mannor, and Mansour]{evendar06}
+E.~Even-Dar, S.~Mannor, and Y.~Mansour.
+\newblock Action elimination and stopping conditions for the multi-armed bandit
+  and reinforcement learning problems.
+\newblock \emph{The Journal of Machine Learning Research}, 7:\penalty0
+  1079--1105, 2006.
+
+\bibitem[Gabillon et~al.(2011)Gabillon, Ghavamzadeh, Lazaric, and
+  Bubeck]{gabillon2011multi}
+V.~Gabillon, M.~Ghavamzadeh, A.~Lazaric, and S.~Bubeck.
+\newblock Multi-bandit best arm identification.
+\newblock \emph{NIPS}, 2011.
+
+\bibitem[Liu and Zhao(2010)]{liu2010distributed}
+Keqin Liu and Qing Zhao.
+\newblock Distributed learning in multi-armed bandit with multiple players.
+\newblock \emph{IEEE Transactions on Signal Processing}, 58\penalty0
+  (11):\penalty0 5667--5681, Nov. 2010.
+
+\bibitem[Mannor and Tsitsiklis(2004)]{mannor04}
+S.~Mannor and J.N. Tsitsiklis.
+\newblock The sample complexity of exploration in the multi-armed bandit
+  problem.
+\newblock \emph{The Journal of Machine Learning Research}, 5:\penalty0
+  623--648, 2004.
+
+\bibitem[Moon et~al.(2010)Moon, Li, Chu, Liao, Zheng, and
+  Chang]{RTUF-learning2010}
+Taesup Moon, Lihong Li, Wei Chu, Ciya Liao, Zhaohui Zheng, and Yi~Chang.
+\newblock Online learning for recency search ranking using real-time user
+  feedback.
+\newblock In \emph{Proc. 9th ACM Conference on Information and Knowledge
+  Management (CIKM'2010)}, pages 1501--1504, October 2010.
+
+\bibitem[Radlinski et~al.(2008)Radlinski, Kurup, and
+  Joachims]{InterleavedBuckets}
+Filip Radlinski, Madhu Kurup, and Thorsten Joachims.
+\newblock How does clickthrough data reflect retrieval quality?
+\newblock In \emph{Proc. 17th ACM Conference on Information and Knowledge
+  Management (CIKM'2008)}, pages 43--52, October 2008.
+
+\bibitem[Yue and Joachims(2009)]{Dueling2009}
+Yisong Yue and Thorsten Joachims.
+\newblock Interactively optimizing information retrieval systems as a dueling
+  bandits problem.
+\newblock In \emph{Proc. 26th Annual International Conference on Machine
+  Learning (ICML'2009)}, page 151, June 2009.
+
+\end{thebibliography}

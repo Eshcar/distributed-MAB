@@ -1,0 +1,469 @@
+%!TEX root = dmab.tex
+
+\section{One Communication Round}
+\label{sec:singleround}
+%In this section we consider the most basic variant of the multi-player MAB problem, 
+%where only one round of communication is allowed, at the end of the game (right before players have to recommend an arm).
+%%In this setting, it is not straightforward to apply standard elimination strategies since such adaptive strategies require constant communication between the players.
+%We begin by presenting a simple lower bound for this setting, demonstrating the limitations on one-round algorithms, and then turn to our algorithmic results.
+%We defer the general treatment of the $(\eps,\del)$-PAC setup to the end of the section (as it is the most technical), and first present a bit simpler algorithm for the best-arm identification task. 
+
+
+
+This section considers the most basic variant of the multi-player MAB problem, where only one round of communication is allowed at the end of the game.
+Here, given a budget of arm pulls, each player decides which arms to pull according to a policy based solely on his results.
+After exhausting the given budget, the players share their results and compute the output.
+For the clarity of exposition, we first present in  Section~\ref{sec:best one round} an algorithm for best-arm identification under this setting. 
+Section~\ref{sec:oneround_eps} deals with the $(\eps,\del)$-PAC setup.
+We demonstrate the tightness of our result in Section~\ref{sec:lower bound} with a lower bound for the required budget of arm pulls in the one round setting.  
+
+
+\subsection{Best-arm Identification Algorithm} \label{sec:best one round}
+
+We now describe a one-round, multi-player MAB algorithm that needs only a
+$\tO(\sqrt{k})$ times more arm pulls than a single-player algorithm, thus
+improving upon the trivial $\tO(k)$ factor of the naive approach. For simplicity, we present a version matching $\delta=1/3$, meaning that the algorithm produces the correct arm with probability at least $2/3$. We explain later how to expand it to deal with arbitrary values of $\delta$. 
+Our algorithm is akin to a majority vote among the multiple players, where
+each player pulls arms in two stages. In the first stage, each
+player independently solves a ``smaller'' MAB instance on a random subset of the
+arms using Successive Elimination%
+\footnote{We note that any (optimal) best-arm
+identification strategy can be used as a building-block in our algorithm, and
+the choice of Successive Elimination here is rather arbitrary.}.
+In the second stage, each player exploits the arm identified as best in the first stage, and
+communicates that arm and its observed reward. See Algorithm \ref{alg:oneround}
+below for a precise description.
+An appealing feature of our algorithm is that it requires each player to
+communicate merely 2 numerical values to the other players. 
+
+Although our goal is pure exploration, each player in the algorithm follows an
+explore-exploit strategy. 
+The idea here is that a player should sample his recommended arm as much as his
+budget permits, even if it was easy to identify in his small-sized problem
+(i.e., did not require many pulls).  
+This way we can guarantee that the top arms are sampled sufficiently-many times
+by the time the players have to agree on a single best arm. 
+
+
+\begin{algorithm} \caption{\textsc{One-round Best-arm}} \label{alg:oneround}
+\begin{algorithmic}[1]
+
+\INPUT{time horizon $T$}
+\OUTPUT {an arm}
+
+\FOR {player $j=1$ to $k$}
+	\STATE choose a subset $A_j$ of $6 n / \sqrt{k}$ arms uniformly at random
+	\STATE \texttt{explore}: execute $i_j \gets \texttt{SE}(A_j,0,\tfrac{1}{3})$ using at most $\tfrac{1}{2} T$ pulls (and halting the algorithm early if necessary); if the algorithm fails to identify any arm or does not terminate gracefully, let $i_j$ be an arbitrary arm
+	\STATE \texttt{exploit}: pull arm $i_j$ for $\tfrac{1}{2} T$ times and let $\qhat_j$ be its average reward
+	\STATE communicate the numbers $i_j, \qhat_j$
+\ENDFOR
+
+\STATE let $k_i$ be the number of players $j$ with $i_j = i$, and 
+define $A = \{i \,:\, k_i > \sqrt{k} \}$
+
+\STATE let $\phat_i = (1/k_i) \sum_{\{j \,:\, i_j = i\}} \qhat_j$ for all $i$
+
+\STATE output $\arg \max_{i \in A} \phat_i$; if the set $A$ is empty, return an arbitrary arm. 
+
+\end{algorithmic}
+\end{algorithm}
+
+
+
+
+
+In Theorem \ref{thm:oneround} we prove that Algorithm \ref{alg:oneround} indeed
+achieves the promised upper bound.
+%\zk{Its probably best to define $H(\Delta,n)$ in the preliminaries and use it in the statements} \tk{right, but the bound is not directly expressible in terms of $H$ (because of log factors...)}
+%\rl{some notations are only defined in the algo, e.g. $k_i$ and $\hat{p}_i$. Please define in the running text.}
+%\tk{these are only used in the analysis -- i don't think we need to get into such details in the text, the defs in the pseudocode are enough.}
+
+\begin{theorem} \label{thm:oneround}
+Algorithm \ref{alg:oneround} identifies the best arm correctly with probability at least $2/3$ using no more than
+\begin{align} \label{eq:oneround_bound}
+	\OO {
+		\sqrt{k} \cdot
+		\sum_{i \ne i^\st} \frac{1}{\Del_i^2} \log \frac{n}{\Del_i} 
+	} 
+\end{align}
+arm pulls, provided that $6 \le \sqrt{k} \le n$.
+The algorithm uses a single communication round, in which each player communicates 2 numerical values.
+\end{theorem}
+%\rl{do we want to use $i^\st$ or run the sum above from $i=2$, given that $i^\st$ is $i_1$? This issue repeats several times in what follows.} \tk{i think $i^\st$ is better for presenting the results}
+
+
+By repeating the algorithm $\O(\log(1/\del))$ times and taking the majority vote of the independent instances, we can amplify the success probability to $1-\del$ for any given $\del > 0$. 
+%\eh{add a reference to a textbook/paper with this result?} \tk{it's a ``folklore'' fact, i believe that no reference is really needed here}
+Note that we can still do that with one communication round (at the end of all executions), but each player now has to communicate $\O(\log(1/\del))$ values%
+\footnote{In fact, by letting each player pick a slightly larger subset of $\O(\sqrt{\log (1/\del)} \cdot n/\sqrt{k})$ arms, we can amplify the success probability to $1-\del$ without needing to communicate more than 2 values per player. However, this approach only works when $k = \Omega(\log(1/\del))$.}. 
+
+%\zk{Make sure the footnote is correct - also verify that we need the bound on $k$.}
+%\rl{I recommend moving the entire sentence from ``Note that we can still'' including the footnote to after Theorem 3.2.}
+
+
+\begin{theorem}
+There exists a $k$-player algorithm that given
+\begin{align*}
+	\OO {
+		\sqrt{k} \cdot
+		\sum_{i \ne i^\st} \frac{1}{\Del_i^2} \log \frac{n}{\Del_i} \log \frac{1}{\del}
+	}
+\end{align*}
+arm pulls, identifies the best arm correctly with probability at least $1-\del$.
+The algorithm uses a single communication round, in which each player communicates $\O(\log(1/\del)) $ numbers.
+\end{theorem}
+
+%\begin{proof}
+%\tk{in appendix? should provide details at all?}
+%\zk{There's no need for this theorem here. In my opinion, theres no need for it in the appendix either. The footnote is enough...}
+%\end{proof}
+
+
+
+
+\subsubsection{Analysis}
+%\rl{I believe it's easier to prove for $T\ge \frac{16 c}{\sqrt{k}} \cdot \sum_{i \ne i^\st} \frac{1}{\Del_i^2} \log \frac{3n}{\Del_i}$, where $\frac{3T}{4}$ is needed for the explore phase as per the proof below, and $\frac{T}{4}$ is needed for the exploit (instead of then changing the log coefficient).}
+%\tk{I prefer leaving the algorithm simple as possible at the cost of a bit loose analysis...}
+
+
+We will show that a budget $T$ of samples (arm pulls) per player, where%
+%\footnote{Here and elsewhere, $\log$ refers to the natural logarithm.}
+\begin{align} \label{eq:T}
+	T 
+	\ge \frac{24 c}{\sqrt{k}} \cdot
+			\sum_{i \ne i^\st} \frac{1}{\Del_i^2} \ln \frac{3n}{\Del_i} \,,
+\end{align}
+suffices for the players to jointly identify the best arm
+$i^\st$ with the desired probability.
+Here, $c$ denotes the constant under the big O notation in eq.~\eqref{eq:se_bound}, and without loss of generality we assume that $c \ge 1$.
+Clearly, this would imply the sample complexity bound stated in Theorem~\ref{thm:oneround}. Note that we did not optimize the constants in the above expression.
+
+
+We begin by analyzing the \texttt{explore} phase of the algorithm. Our first lemma shows that each player chooses the global best arm and identifies it as the local best arm with sufficiently large probability.
+
+
+\begin{lemma} \label{lem:kexplore}
+When \eqref{eq:T} holds, each player identifies the (global) best arm correctly after the \emph{\texttt{explore}} phase with probability at least $2/\sqrt{k}$.
+\end{lemma}
+
+
+\begin{proof}
+Let $H = \sum_{i \ne i^\st} (1/\Del_i^2) \ln (3n/\Del_i)$ and
+$H_j = \sum_{i^\st \ne i \in A_j} (1/\Del_i^2) \ln (3n/\Del_i)$ for all $j$.
+Then $\E[H_j \mid i^\st \in A_j] \le 6H/\sqrt{k}$ by the linearity of expectation, and Markov's inequality thus gives that
+$
+	\Pr[H_j \le 12H/\sqrt{k} \mid i^\st \in A_j]
+	\ge 1/2 .
+$
+Clearly, we also have $\Pr[i^\st \in A_j] = 6/\sqrt{k}$ which implies that
+\begin{align} \label{eq:H_j}
+	\Pr[i^\st \in A_j \mbox{ and } H_j \le 12H/\sqrt{k}] \ge 3/\sqrt{k} \,.
+\end{align}
+Now consider the ``local'' MAB problem facing player $j$, over the subset of arms $A_j$. If the (global) best arm $i^\st$ is amongst the arms in $A_j$, then by Theorem~\ref{thm:sebound} the \texttt{SE} algorithm player~$j$ executes needs no more than
+\begin{align*}
+	T_j
+	:= c \sum_{i^\st \ne i \in A_j} \frac{1}{\Del_i^2}\ln \frac{3n}{\Del_i}
+	= c H_j
+\end{align*}
+pulls in order to identify $i^\st$ successfully with probability $2/3$. 
+In case that $H_j \le 12H/\sqrt{k}$, we have
+$
+	T_j
+	\le 12 c H / \sqrt{k}
+	\le T/2 \,,
+$
+which means that the pulls budget of player $j$ suffices for identifying the
+best arm. Together with \eqref{eq:H_j}, we conclude that with probability at
+least $2/\sqrt{k}$ player~$j$ identifies the best arm correctly.
+%\rl{so I'd replace $T/2$ by $3T/4$ in the above with the alternative definition of $T$.} 
+\end{proof}
+
+We next address the \texttt{exploit} phase. The next simple lemma shows that the
+popular arms (i.e.~those selected by many players) are estimated to a sufficient
+precision.  
+
+
+\begin{lemma} \label{lem:kexploit}
+Provided that \eqref{eq:T} holds, with probability at least $5/6$
+we have $\abs{\phat_i - p_i} \le \tfrac{1}{2} \Delst$ for all arms $i \in A$.
+%where $A$ is the set of arms identified as ``best'' by at least $\sqrt{k}$ players in the \texttt{exploit} phase, and $\phat_i$ is the average sampled reward of each such arm.
+%\rl{added the last sentence to define notations that were only given in the body of the ALG} \tk{this is an internal lemma, it's OK that it uses ``internal'' notation}
+\end{lemma}
+
+%\eh{Might want to swap $A$ with $C$ (candidates?) to avoid confusion with $A_j$.} \tk{i think it's ok}
+
+
+\begin{proof}
+Consider some arm $i \in A$. The estimate $\phat_i$ is the average reward of 
+$k_i T/2 \ge \sqrt{k} T/2 \ge (2/\Delst^2) \ln(12n)$
+arm pulls (of the \texttt{exploit} phase).
+Hoeffding's inequality now gives that
+\begin{align*}
+	\Pr[\abs{\phat_i - p_i} > \tfrac{1}{2} \Delst]
+	\le 2 \exp (-\tfrac{1}{2} \Delst^2 \cdot k_i T/2)
+	\le 1/6n \,,
+\end{align*}
+and the lemma follows via a union bound.
+\end{proof}
+
+%\rl{if we had $T=\frac{16c}{\sqrt{k}}H$, then with $k_i\frac{4c}{\sqrt{k}}H$ pulls I believe it's possible to prove the above result as well.} \tk{ok, changed the log constant}
+
+
+
+We can now prove Theorem \ref{thm:oneround}.
+
+\begin{proof}
+Let us first show that with probability at least $5/6$, the best arm $i$ is contained in the set $A$.
+To this end, notice that $k_{i^\st}$ is the sum of $k$ i.i.d.~Bernoulli random variables $\{I_j\}_{j}$ where $I_j$ is the indicator of whether player $j$ chooses arm $i^\st$ after the \texttt{explore} phase. By Lemma~\ref{lem:kexplore} we have that $\E[I_j] \geq 2/\sqrt{k}$ for all $j$, hence by Hoeffding's inequality,
+\begin{align*}
+	\Pr\left[k_{i^\st} \le \sqrt{k}\right] 
+	&\le \Pr\left[ \frac{1}{k}\sum_{j=1}^k (I_j - \E[I_j]) \le \frac{-1}{\sqrt{k}} \right] \\
+	&\le \exp(-2k/k) \le 1/6
+\end{align*}
+%\zk{We should probably cite Hoeffding's inequality along with its constants. Also, if you don't like the notation used for the  new variables ($X_j$), feel free to rename them.} \tk{cite Hoeffding??}
+which implies that $i^\st \in A$ with probability at least $5/6$.
+
+
+Next, note that with probability at least $5/6$ the arm $i \in A$ having the highest empirical reward $\phat_i$ is the one with the highest expected reward $p_i$.
+Indeed, this follows directly from Lemma \ref{lem:kexploit} that shows that with probability at least $5/6$, for all arms $i \in A$ the estimate $\phat_i$ is within $\frac{1}{2}\Del$ of the true bias $p_i$.
+
+Hence, via a union bound we conclude that with probability at least $2/3$, the best arm is in $A$ and has the highest empirical reward. 
+In other words, with probability at least $2/3$ the algorithm outputs the best arm~$i^\st$.
+\end{proof}
+
+
+
+
+
+
+
+
+\subsection{$(\eps,\del)$-PAC Algorithm} \label{sec:oneround_eps}
+
+We now present Algorithm~\ref{alg:oneround_eps} whose purpose is to recover an $\eps$-optimal arm.
+The algorithm is similar to Algorithm~\ref{alg:oneround} of the previous section, but now each player attempts to find an $\O(\eps)$-best arm in a subsampled problem. 
+Note, however, that there may be more than one $\eps$-best arm, so each
+``successful'' player might come up with a different $\eps$-best
+arm.
+Nevertheless, our analysis shows that, with high probability, a subset of
+the players can still arrive to a consensus on a single $\eps$-best arm. 
+
+
+In Theorem~\ref{thm:oneround_eps} we prove that our algorithm needs only
+$\tO(\sqrt{k})$ times more arm pulls than a single-player algorithm for
+identifying an $O(\eps)$-best arm.
+
+%\eh{To this point it is not clear what identifies means in the context of the PAC algorithm.} \tk{Will be defined in prelims}
+
+%\eh{Can we amplify the success probability here as well? } \tk{yes - it's possible to modify the alg to this end, by letting each player execute $\log(1/\del)$ copies and then reach concensus of $\sim \sqrt{k \log(1/\del)}$ arms. But the details are not interesting...}
+
+\begin{algorithm} \caption{\textsc{One-round $\eps$-arm}} \label{alg:oneround_eps}
+\begin{algorithmic}[1]
+
+\INPUT{time horizon $T$, accuracy $\eps$}
+\OUTPUT {an arm}
+
+\FOR {player $j=1$ to $k$}
+	\STATE choose a subset $A_j$ of $12n/\sqrt{k}$ arms uniformly at random
+	\STATE \texttt{explore}: execute $i_j \gets \texttt{SE}(A_j,\eps,\tfrac{1}{3})$ using at most $\tfrac{1}{2}T$ pulls (and halting the algorithm early if necessary); if the algorithm fails to identify any arm or does not terminate gracefully, let $i_j$ be an arbitrary arm
+	\STATE \texttt{exploit}: pull arm $i_j$ for $\tfrac{1}{2}T$ times, and let $\qhat_j$ be the average reward
+	\STATE communicate the numbers $i_j, \qhat_j$
+\ENDFOR
+
+\STATE let $k_i$ be the number of players $j$ with $i_j = i$
+
+\STATE let $t_i = \tfrac{1}{2} k_i T$ and 
+$\phat_i = (1/k_i) \sum_{\{j \,:\, i_j = i\}} \qhat_j$ for all $i$
+
+\STATE define $A = \{i \in [n] \,:\, t_i \ge (4/\eps^2) \ln (12n)\}$
+
+\STATE output $\arg \max_{i \in A} \phat_i$; if the set $A$ is empty, return an arbitrary arm. 
+\end{algorithmic}
+\end{algorithm}
+
+%\eh{how does the algorithm know that SE fails or does not terminate gracefully?} \tk{rephrased that sentence}
+
+%\eh{describe/define notations in the algorithm that are later used in the proofs, such as $t_i$.} 
+%\tk{no need - proofs will appear in appendix, and those notation are unnecessary elsewhere}
+
+
+\begin{theorem} \label{thm:oneround_eps}
+Algorithm \ref{alg:oneround_eps} identifies a $2\eps$-best arm with probability at least $2/3$ using no more than
+\begin{align} \label{eq:1rbound_eps}
+	\OO {
+		\sqrt{k} \cdot
+		\sum_{i \ne i^\st} \frac{1}{(\Del_i^\eps)^2} \log \frac{n}{\Del_i^\eps}
+	}
+\end{align}
+arm pulls, provided that $24 \le \sqrt{k} \le n$.
+The algorithm uses a single communication round, in which each player communicates 2 numerical values.
+\end{theorem}
+%\rl{I'm confused why the algo doesn't actually identify a $3\eps$-best arm. The
+%explore phase might return an $\eps$-best, which then is estimated at
+%$2\eps$-best and slightly loses to a $3\eps$-best that was lucky. In other
+%words, Lemma 3.8 guarantees a $2\eps$ gap from an already $1\eps$ gap. What am
+%I missing?} \tk{it's correct - fixed.}
+
+
+\subsubsection{Analysis}
+
+
+Before proving the theorem, we first state several key lemmas. In the following,
+let $n_\eps$ and $n_{2\eps}$ denote the number of $\eps$-best and $2\eps$-best arms respectively.
+Our analysis considers two different regimes: $n_{2\eps} \le \tfrac{1}{50}\sqrt{k}$ and $n_{2\eps} > \tfrac{1}{50}\sqrt{k}$, and shows that in any case,
+\begin{align} \label{eq:T_eps}
+	T \ge
+	\frac{400 c}{\sqrt{k}} 
+		\sum_{i \ne i^\st} \frac{1}{(\Del_i^{\eps})^2}\ln \frac{24n}{\Del_i^{\eps}}
+\end{align}
+%\eh{seems strange that the constant for the PAC setting is greater than for the best arm setting. if this is due to the difference between $\Del_i^{\eps}$ and $\Del_i$, then explain.} \tk{the analysis is more involved, hence the constant is less accurate... i don't think we need to discuss the value of the constants at all.}
+suffices for identifying a $2\eps$-best arm with the desired probability.
+Again, we use $c$ to denote the constant under the big O notation in eq.~\eqref{eq:se_bound} and assume that $c \ge 1$.
+Clearly, this implies the sample complexity bound stated in eq.~\eqref{eq:1rbound_eps}.
+
+The first lemma shows that at least one of the players is able to find an $\eps$-best arm. As we later show, this is sufficient for the success of the algorithm in case there are many $2\eps$-best arms.
+
+%\eh{MUST elaborate more on the motivation for splitting the analysis into two cases; give some intuition/roadmap of the proof.} \tk{I think that the exposition of lemmas below suffices (we won't have space for a discussion anyhow).}
+
+\begin{lemma} \label{lem:kexplore_eps2}
+When \eqref{eq:T_eps} holds, at least one player successfully identifies an $\eps$-best arm in the \emph{\texttt{explore}} phase, with probability at least $5/6$.
+\end{lemma}
+
+
+The next lemma is more refined and states that in case there are few $2\eps$-best arms, the probability of each player to successfully identify an $\eps$-best arm grows linearly with $n_\eps$.
+
+
+\begin{lemma} \label{lem:kexplore_eps1}
+Assume that $n_{2\eps} \le \tfrac{1}{50}\sqrt{k}$. When \eqref{eq:T_eps} holds, each player identifies an $\eps$-best arm in the \emph{\texttt{explore}} phase, with probability at least $2 n_\eps / \sqrt{k}$.
+\end{lemma}
+
+
+
+The last lemma we need analyzes the accuracy of the estimated rewards of arms in
+the set $A$. %\eh{???}
+
+\begin{lemma} \label{lem:estimates_eps}
+With probability at least $5/6$, we have $\abs{\hat{p}_i - p_i} \le \eps/2$ for all arms $i \in A$.
+\end{lemma}
+
+
+
+
+%\begin{corollary} \label{cor:kexplore_eps}
+%\tk{integrate into main proof}
+%Assume that $n_{2\eps} \le \tfrac{1}{4\alpha}$. When \eqref{eq:T1_eps} holds, with probability at least $5/6$ the set $A$ contains an $\eps$-best arm.
+%\end{corollary}
+%
+%
+%\begin{proof}
+%Let $N$ denote the number of players that identified some $\eps$-best arm.
+%Since each player succeeds with probability at least $\frac{1}{6} \alpha n_{\eps}$, we have $\E[N] \ge \tfrac{1}{6} \alpha n_{\eps} k$.
+%Then, by Hoeffding's inequality,
+%\begin{align*}
+%	\Pr[N < \tfrac{1}{12} \alpha n_{\eps} k]
+%	\le \exp(-2 (\tfrac{1}{12} \alpha n_{\eps})^2 k)
+%	\le \exp(-2)
+%	\le \tfrac{1}{6} \,.
+%\end{align*}
+%That is, with probability $5/6$, at least $\tfrac{1}{12} \alpha n_{\eps} k$ players found an $\eps$-best arm. 
+%A~pigeon-hole argument shows that in this case there exists an $\eps$-best arm $i^\st$ selected by at least $\tfrac{1}{12} \alpha k = \sqrt{k}$ players.
+%Hence, with probability $5/6$ the number of samples of this arm collected in the \texttt{exploit} phase is at least $t_{i^\st} = \tfrac{1}{2} k_{i^\st} T \ge  \tfrac{1}{24} \alpha k T \ge (1/\eps^2) \log(12n)$, which means that $i^\st \in A$.
+%\end{proof}
+
+
+
+%\begin{lemma} \label{lem:kexploit_eps2}
+%\tk{integrate into main proof}
+%Assume that $n_{2\eps} > \frac{1}{4\alpha}$, and
+%\begin{align*}
+%	T 
+%	\ge \frac{400 c}{\sqrt{k}} 
+%		\sum_{i \ne i^\st} \frac{1}{(\Del_i^{2\eps})^2}\log \frac{24n}{\Del_i^{2\eps}} \,.
+%\end{align*}
+%Then $i_j \in A$ for all players $j=1,\ldots,k$.
+%\end{lemma}
+%
+%\begin{proof}
+%Since at least $n_{2\eps}$ arms have $\Del_i \le 2\eps$, for any $i\in\{i_1,i_2,\ldots,i_k\}$,
+%\begin{align*}
+%	t_i 
+%	\ge \tfrac{1}{2} T
+%	\ge \frac{C}{2\sqrt{k}} \cdot \frac{n_{2\eps}}{(2\eps)^2} \log \frac {24n}{2\eps}
+%	> \frac{C}{400} \cdot \frac{1}{\eps^2} \log \frac {12n}{\eps}
+%	> \frac{1}{\eps^2} \log (12n) \,,
+%\end{align*}
+%that is, $i \in A$.
+%\end{proof}
+
+
+For the proofs of the above lemmas, refer to the supplementary material.
+We now turn to prove Theorem~\ref{thm:oneround_eps}.
+
+
+
+\begin{proof}
+We shall prove that with probability $5/6$ the set $A$ contains at least one $\eps$-best arm.
+This would complete the proof, since Lemma~\ref{lem:estimates_eps} assures that with probability $5/6$, the estimates $\phat_i$ of all arms $i \in A$ are at most $\eps/2$-away from the true reward $p_i$, and in turn implies (via a union bound) that with probability $2/3$ the arm $i \in A$ having the maximal empirical reward $\phat_i$ must be a $2\eps$-best arm.
+
+First, consider the case $n_{2\eps} > \tfrac{1}{50}\sqrt{k}$. Lemma~\ref{lem:kexplore_eps2} shows that with probability $5/6$ there exists a player $j$ that identifies an $\eps$-best arm $i_j$.
+Since for at least $n_{2\eps}$ arms $\Del_i \le 2\eps$, we have
+\begin{align*}
+	t_{i_j} 
+	\ge \tfrac{1}{2} T
+	\ge \frac{400}{2\sqrt{k}} \cdot \frac{n_{2\eps}-1}{(2\eps)^2} \ln \frac {24n}{2\eps}
+	\ge \frac{1}{\eps^2} \ln (12n) \,,
+\end{align*}
+that is, $i_j \in A$.
+
+%\rl{if the optimal arm is also counted in $n_{2\eps}$, then the inequality above doesn't hold as the sum doesn't have the full $n_{2\eps}$ summands - the best isn't summed over.} \tk{correct - fixed}
+%\eh{I would start with this case - it is clear why you apply Lemma~\ref{lem:kexplore_eps1} here. It will help to understand why you apply Lemma~\ref{lem:kexplore_eps2} in the previous case.}
+Next, consider the case $n_{2\eps} \le \tfrac{1}{50}\sqrt{k}$.
+Let $N$ denote the number of players that identified some $\eps$-best arm.
+The random variable~$N$ is a sum of Bernoulli random variables $\{I_j\}_j$ where $I_j$ is an indicator to whether player $j$ identified some $\eps$-best arm. By Lemma~\ref{lem:kexplore_eps1}, $\E[I_j]\geq 2 n_{\eps} / \sqrt{k}$ and thus by Hoeffding's inequality,
+\begin{align*}
+	\Pr\left[N < n_{\eps} \sqrt{k}\right] 
+	&= \Pr\left[ \frac{1}{k} \sum_{j=1}^k (I_j-\E[I_j]) \le -\frac{n_\eps}{\sqrt{k}} \right] \\
+	&\le \exp(-2 n_{\eps}^2)
+	\le \frac{1}{6} \,.
+\end{align*}
+That is, with probability $5/6$, at least $n_{\eps} \sqrt{k}$ players found an $\eps$-best arm. 
+A~pigeon-hole argument shows that in this case there exists an $\eps$-best arm $i^\st$ selected by at least $\sqrt{k}$ players.
+Hence, with probability $5/6$ the number of samples of this arm collected in the \texttt{exploit} phase is at least $t_{i^\st} \ge \sqrt{k} T/2 > (1/\eps^2) \ln(12n)$, which means that $i^\st \in A$.
+\end{proof}
+
+%\eh{need to show that ``if some $\eps$-best is in $A$ then all players output the same arm'' - assuming you meant for consensus.} \tk{i don't think that our model needs to require consensus -- only that each player comes up with some $\eps$-best arm}
+
+
+
+
+
+
+\subsection{Lower Bound} \label{sec:lower bound}
+
+%\eh{move before Section~\ref{sec:best one round}}
+
+The following theorem suggests that in general, for identifying the best arm $k$ players need at least $\tilde{\Omega}(\sqrt{k})$ times the budget required for a single player to do so, when only allowed one round of communication (at the end of the game). 
+Clearly, this also implies that a similar lower bound holds in the PAC setup, and proves that our algorithmic results for the one-round case are essentially tight.    
+
+
+\begin{theorem} \label{thm:lb1}
+%There exists a constant $c_1$ such that for any distributed $k$-player algorithm that uses one communication round, there exist rewards $p_1,\ldots,p_n$ such that 
+%For any integers $k<n$ and a $k$-player algorithm for $n$ arms that uses one communication round, \rl{need here the condition/rule that all players must sample the same number of pulls, otherwise one can play and communicate to the rest}
+%\tk{the model is formalized in the prelims -- should be clear at this point}
+there exist rewards $p_1,\ldots,p_n$ and integer $T$ such that
+\begin{itemize}
+\item
+each player in the algorithm must use at least $T/\sqrt{k}$ arm pulls for
+them to collectively identify the best arm with probability at least $2/3$;
+\item
+there exist a single-player algorithm that needs at most $\tO(T)$ pulls for
+identifying the best arm with probability at least $2/3$.
+\end{itemize}
+\end{theorem}
+
+%It should be noted that the $\tilde{\Omega}(1/\sqrt{k})$ bound of the above theorem applies only to a particular regime of the problem parameters, namely when $\Del = \O(1/\sqrt{n})$.
+%\zk{commented - no need to be holier than the pope}
+
+The proof of the theorem is deferred to the supplementary material.
+
+

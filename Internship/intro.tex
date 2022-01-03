@@ -1,0 +1,102 @@
+%!TEX root = dmab.tex
+
+\section{Introduction}
+\label{sec:intro}
+Over the past few years, reinforcement learning in general and multi-armed bandit
+(MAB) algorithms in particular have been employed in an increasing amount of web applications.
+MAB algorithms choose between stories to showcase on media
+sites~\citep{COKE2009,COKE2008}, among ranking algorithms of search
+results~\citep{RTUF-learning2010,InterleavedBuckets,Dueling2009}, trigger
+ads~\citep{COKE-mortal2008}, and more.
+In many of these applications, websites cannot be served from a single front-end machine.
+The sheer volume of user requests they face, along with the geographical diversity those request come from, require sites to use multiple front-end machines that are often dispersed geographically among multiple data centers.
+
+Assume that a single machine cannot accommodate the
+throughput of requests; rather, $k$ different servers are needed. We will
+refer to these as {\em players}. Each player is responsible for deciding
+which arms to pull for its share of requests, and for updating its model once
+rewards can be inferred from user interactions. 
+This paper studies the tradeoffs between the communication among the $k$
+players, and their overall learning performance. At one extreme, if
+all players broadcast to each other each and every $\langle$pull, reward$\rangle$
+pair as they happen, they can each simulate the decisions of a centralized algorithm. However, the load on each player would then be
+similar to the load of a centralized model, which we assumed to be prohibitive. 
+At the other extreme, if the players never communicate, each will suffer the
+learning curve (i.e.~number of pulls) required in order to attain good
+performance, thereby multiplying the cost of learning by~$k$. We aim to quantify
+this tradeoff between inter-player communication and the cost of learning.
+
+Following \citet{audibert10,evendar06}, we focus on the problem of identifying a ``good'' arm with few arm pulls as possible (that is, minimizing the \emph{simple regret}).
+Our objective is thus purely explorative, and specifically we do not care about the incurred costs or the involved regret. 
+As discussed by \citet{bubeck2009pure,audibert10}, this is indeed the natural goal in many situations.
+In this work, we build upon the results known in the single-player exploratory setup, and in particular the Successive Elimination algorithm \citep{evendar06}, showing how they can be used in a multi-player setting in a communication-efficient way.
+
+%To this end, we concretely model the problem as follows. 
+Our setting is accordingly as follows.
+The players aim to identify an $\eps$-best (i.e., $\eps$-optimal) bandit arm with high confidence.
+They are evaluated by the number of total arm pulls, aggregated across all $k$ players, required for them to do so. The arm pulls are evenly divided among the $k$ players, and are assumed to take place synchronously. 
+In order to reach their common goal, players may communicate with each other. Following \citet{balcan12}, we measure communication by counting the number of {\em communication rounds} required by them in a protocol, where in a single round of communication each player broadcasts a single message to all the other players.
+
+Our main results deal with the case where players are allowed to communicate only \emph{once}.
+For this scenario, we present $k$-player algorithms that need only $\sqrt{k}$ times more arm pulls for identifying the best and $\eps$-best bandit arm, as compared to the conventional, single-player setting.
+%A single round of communication thus leads to an improvement of~$\sqrt{k}$ factor in the number of required pulls over a na\"{i}ve, zero communication approach.
+A single round of communication thus leads to an improvement of $\sqrt{k}$ factor in the required number of iterations over a single player. 
+We complement our algorithmic results for the single round scenario with a lower bound on the required number of pulls, implying that our results are essentially optimal. 
+
+In addition, we investigate how many communication rounds are required for competing with the learning performance of a single-player algorithm.
+We present a $k$-player algorithm achieving the \emph{same} performance as a centralized algorithm with communication depending only logarithmically on $1/\eps$.
+%Further, we present an algorithm that tradeoffs between the number of arm pulls and the number of communication rounds.
+Interestingly, \citet{balcan12} established a similar result in a distributed PAC setting using boosting algorithms. Our algorithm achieves the same logarithmic dependence of communication on $1/\eps$ for the multi-player MAB problem, while enjoying the optimal, distribution-dependent sample complexity upper bound.
+
+
+%\subsection{Our contributions}
+%
+%The contributions of this paper are as follows:
+%\begin{itemize}
+%\item We formally define the multi-player MAB problem. To the best of our
+%knowledge, we are the first to introduce such a setting.
+%\item We present $k$-player algorithms with a single round of communication
+%that need roughly $\sqrt{k}$ times more arm pulls for identifying the best and $\eps$-best bandit arm in a multi-player setting, as compared to the centralized, single-player setting.
+%We complement our algorithmic results for the single round case with a lower bound, showing that in the worst case, an order of $\sqrt{k}$ times more arm pulls are needed for identifying the best arm.
+%\item We then move on to investigate the interplay between the required number of arm pulls and the required number of communication rounds between the various players. 
+%We show a $k$-player algorithm achieving the \emph{same} performance as a centralized algorithm with communication depending only logarithmically on $1/\eps$.
+%Further, we present an algorithm that tradeoffs between the number of arm pulls and the number of communication rounds.
+%\end{itemize}
+%
+%\tk{re. $\log(1/\eps)$ alg, elaborate a bit} Interestingly, \cite{balcan12} established a similar result in a distributed PAC setting using boosting algorithms. Our algorithm achieves the same logarithmic dependence of communication on $1/\eps$ for the multi-player MAB problem, while enjoying the optimal, distribution-dependent sample complexity upper bound.
+
+
+
+\subsection{Related Work}
+
+
+The classic (single-player) Multi-Armed Bandits problem was first considered under the PAC model by \citet{evendar02}, who proposed the \emph{Successive Elimination} (SE) strategy for $\eps$-optimal arm identification.
+% which inspires large parts of our work. \zk{We do not use any of the technology of SE - we use it as a black box...}
+\citet{mannor04} provided tight, distribution-dependent sample complexity lower bounds for several variants of the PAC model, showing that the SE algorithm is essentially optimal in terms of its sample complexity. 
+The setting was revisited by \citet{bubeck2009pure}, that investigated the links between the simple and cumulative regret measures and indicated that regret-minimizing algorithms (like UCB of \citet{auer2002finite}) are not well-suited for pure exploration tasks. 
+More recently, \citet{audibert10} presented algorithms for best-arm identification, proved their optimality and demonstrated their effectiveness in simulations.
+
+In a recent work, \citet{gabillon2011multi} consider a multi-player (termed ``multi-bandit'') MAB problem similar to ours, in which each player has to identify the best arm.
+However, in their setting each player gets a different set of arms (with its own rewards) and the challenge is to distribute the limited resources at hand (namely $T$ arm pulls) so as to maximize the confidence of all players simultaneously. In our setting, each player gets access to the same set of arms, with the joint goal of identifying the ($\eps$-)best arm while communicating with each other as few times as possible.
+Another variant of a multi-player MAB problem is studied by \citet{liu2010distributed}. In their setup, where the goal is to minimize the cumulative regret, players do not communicate but rather compete with each other: once two players pull the same arm at the same time, a ``collision'' occurs and they share the reward in some way. In contrast, we study how sharing observations helps players achieve their goal jointly.
+
+A related setting was considered by \citet{balcan12}, who considered a distributed PAC model and investigated the involved communication trade-offs. 
+In their model, data is distributed between the various players and the goal is to learn well with respect to the overall (i.e.~mixture) distribution of the data. 
+Some of their results also focus on learning using only one round of communication.
+Our MAB setting features an additional difficulty of designing an \emph{adaptive} sampling strategy for each player (i.e., \emph{choosing} which arms to sample), without exchanging samples with other players. 
+While their results do not have direct implications in our setting, the main theme is similar.
+%\zk{Do they have any result regarding the setting of one communication round? Or do they only discuss the logarithmic number of rounds? If there is something about one communication round we should mention it. If not, we should note that they do not discuss that setting and why (if there's a good reason)} 
+%\tk{they do discuss one round in some specific cases, but their general results do not concern this case - simply because generic learning with one round in their setting is trivial. I don't think we should get into details here, I just mentioned that they DO consider one round.}
+
+
+
+%\tk{can be omitted if space requires - not needed for conference version}
+%\subsection{Organization}
+%
+%The rest of this paper is organized as follows. The problem setup is formally defined in
+%Section~\ref{sec:prelims}. Section~\ref{sec:singleround} presents upper
+%bounds and a matching lower bound for the required number of arm pulls, as
+%a function of the number of players, when the players are allowed a single
+%round of communication. Section~\ref{sec:multiplerounds} extends the discussion
+%to multiple rounds of communication. We conclude in Section~\ref{sec:conc}.
+

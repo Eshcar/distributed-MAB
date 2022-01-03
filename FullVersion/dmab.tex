@@ -1,0 +1,537 @@
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%% ICML 2013 EXAMPLE LATEX SUBMISSION FILE %%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Use the following line _only_ if you're still using LaTeX 2.09.
+%\documentstyle[icml2013,epsf,natbib]{article}
+% If you rely on Latex2e packages, like most moden people use this:
+\documentclass[12pt]{article}
+
+% For figures
+\usepackage{graphicx} % more modern
+%\usepackage{epsfig} % less modern
+\usepackage{subfigure} 
+
+% For citations
+\usepackage{natbib}
+
+% For algorithms
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% As of 2011, we use the hyperref package to produce hyperlinks in the
+% resulting PDF.  If this breaks your system, please commend out the
+% following usepackage line and replace \usepackage{icml2013} with
+% \usepackage[nohyperref]{icml2013} above.
+\usepackage{hyperref}
+
+% our stuff
+\usepackage{authblk}
+\usepackage{cellspace}
+\include{header}
+
+% Packages hyperref and algorithmic misbehave sometimes.  We can fix
+% this with the following command.
+\newcommand{\theHalgorithm}{\arabic{algorithm}}
+
+% Employ the following version of the ``usepackage'' statement for
+% submitting the draft version of the paper for review.  This will set
+% the note in the first column to ``Under review.  Do not distribute.''
+%\usepackage{icml2013}
+% Employ this version of the ``usepackage'' statement after the paper has
+% been accepted, when creating the final version.  This will set the
+% note in the first column to ``Proceedings of the...''
+%\usepackage[accepted]{icml2013}
+
+% Conf. version flag
+%\gdef\isconf{1}
+
+
+
+% The \icmltitle you define below is probably too long as a header.
+% Therefore, a short form for the running title is supplied here:
+%\icmltitlerunning{Exploratory Multi-Player Multi-Armed Bandits}
+
+\sloppy
+\setcitestyle{authoryear,round,citesep={;},aysep={,},yysep={;}}
+
+
+\title{Exploratory Multi-Player Multi-Armed Bandits \\
+{\large\bf DRAFT -- please do not distribute} 
+}
+
+
+\author[1]{Eshcar Hillel}
+\author[1]{Zohar Karnin}
+\author[2]{Tomer Koren}
+\author[1]{Ronny Lempel}
+\author[1]{Oren Somekh}
+\affil[1]{Yahoo! Labs, Haifa}
+\affil[2]{Technion -- Israel Institute of Technology}
+
+\begin{document} 
+\maketitle
+%\twocolumn[
+%\icmltitle{Exploratory Multi-Player Multi-Armed Bandits}
+%
+%% It is OKAY to include author information, even for blind
+%% submissions: the style file will automatically remove it for you
+%% unless you've provided the [accepted] option to the icml2013
+%% package.
+%\icmlauthor{Eshcar Hillel}{eshcar@yahoo-inc.com}
+%\icmlauthor{Zohar Karnin}{zkarnin@yahoo-inc.com}
+%\icmlauthor{Tomer Koren}{tomerk@technion.ac.il}
+%\icmlauthor{Ronny Lempel}{rlempel@yahoo-inc.com}
+%\icmlauthor{Oren Somekh}{orens@yahoo-inc.com}
+%\vskip 0.1in
+%\icmladdress{Yahoo! Labs, Haifa}
+%\vskip -0.1in
+%\icmladdress{Technion --- Israel Institute of Technology}
+%
+%% You may provide any keywords that you 
+%% find helpful for describing your paper; these are used to populate 
+%% the "keywords" metadata in the PDF but will not be shown in the document
+%\icmlkeywords{}
+%
+%
+%\ifdefined\isconf
+%\else
+%\bf \centering Note: this is the full version of the paper. \\
+%\bf \centering See the Appendix for supplementary material.
+%\fi
+%
+%\vskip 0.3in
+%]
+
+
+
+
+
+
+
+
+%\documentclass[11pt]{article}
+%
+%\usepackage{geometry}                % See geometry.pdf to learn the layout options. There are lots.
+%\geometry{letterpaper}                   % letterpaper or a4paper or a5paper or ... 
+%%\geometry{landscape}                % Activate for for rotated page geometry
+%%\usepackage[parfill]{parskip}    % Activate to begin paragraphs with an empty line rather than an indent
+%
+%\usepackage{graphicx}
+%\usepackage{amssymb}
+%\usepackage{epstopdf}
+%\DeclareGraphicsRule{.tif}{png}{.png}{`convert #1 `dirname #1`/`basename #1 .tif`.png}
+%
+%\usepackage[round,comma]{natbib}
+%\usepackage{algorithm,algorithmic}
+%\renewcommand{\algorithmicrequire}{\textbf{Input:}}
+%\renewcommand{\algorithmicensure}{\textbf{Output:}}
+%%\usepackage[boxed,noline,linesnumbered]{algorithm2e}
+%\usepackage[colorlinks=true,linkcolor=blue,citecolor=blue]{hyperref}
+%\usepackage{cellspace}
+%\usepackage{authblk}
+%
+%
+%
+%%\sloppy
+%\include{header}
+%
+%
+%
+%\title{Multi-Player Multi-Armed Bandits}
+%
+%
+%\author[1]{Eshcar Hillel}
+%\author[1]{Zohar Karnin}
+%\author[2]{Tomer Koren}
+%\author[1]{Ronny Lempel}
+%\author[1]{Oren Somekh}
+%\affil[1]{Yahoo! Labs, Haifa}
+%\affil[2]{Technion -- Israel Institute of Technology and Yahoo! Research}
+%
+%
+%
+%
+%
+%\begin{document}
+%\maketitle
+
+
+\begin{abstract}
+We study the exploratory Multi-Armed Bandit (MAB) problem in a setting where $k$ players collaborate in order to identify an $\eps$-optimal arm.
+Our motivation comes from recent employment of MAB models in large-scale, distributed web applications.
+Our results demonstrate a trade-off between the number of arm pulls required for
+the task, and the required amount of communication between the players.
+In particular, our main result shows that by allowing the $k$ players to communicate only once, they are able to learn using only $\sqrt{k}$ times more arm pulls than what required in the single player setting. 
+This implies that distributing the learning to $k$ players gives rise to a factor~$\sqrt{k}$ speedup in learning time as compared to a single player.
+We complement this result with a lower bound showing this is in general the best possible. 
+On the other extreme, we present an algorithm that uses the same amount of arm pulls as needed for a single player with communication logarithmic in~$1/\eps$, as well as an algorithm that explicitly tradeoffs arm pulls with communication.
+\end{abstract}
+
+
+
+\input{intro.tex}
+
+
+
+
+
+
+
+\section{Problem Setup and Background}
+\label{sec:prelims}
+
+
+\subsection{Model and Notation}
+
+Our basic model is a generalization of the classic Multi-Armed Bandit (MAB) model.
+In the Multi-Player Multi-Armed Bandit setting, there are $k \ge 1$ individual players. The players are given $n$ arms, enumerated by $[n] := \{1,2,\ldots,n\}$.
+Each arm $i \in [n]$ is associated with a reward, which is a binary random variable with expectation $p_i \in [0,1]$.
+For convenience, we assume that the arms are ordered by their expected rewards, that is $p_1 \ge p_2 \ge \cdots \ge p_n$.
+At every time step $t=1,2,\ldots,T$, each player pulls one arm of his choice and observes an independent sample of its reward. 
+%\rl{This is actually too strong a constraint. If you force all players to pull simultaneously per step, then if $k$ is large enough you cannot simulate the single player even with communication rounds after each time step, since the single player pulls one arm and reevaluates while the above formulation would mean to pull k arms and reevaluate. A delicate change is needed} \tk{I added the word ``may'' - does it work?}
+Each player may choose any of the arms, regardless of the other players and their actions.
+At the end of the game, each player must commit to a single arm. 
+
+In the \emph{best-arm identification} version of the problem, the goal of a multi-player algorithm given some target confidence level $\del>0$, is that with probability at least $1-\del$ \emph{all} players correctly identify the best arm (i.e.~the arm having the maximal expected reward).
+For simplicity, we assume in this setting that the best arm is unique.
+Similarly, in the \emph{$(\eps,\del)$-PAC} variant the goal is that each player finds an $\eps$-optimal (or ``$\eps$-best'') arm, that is an arm $i$ with $p_i \ge p_1 - \eps$, with high probability.
+In this paper we focus on the more general $(\eps,\del)$-PAC setup, which also includes best-arm identification for $\eps=0$. 
+We use the term \emph{sample complexity} to refer to the total number of arm pulls needed for achieving the players' goal (at the desired confidence).
+
+During a \emph{communication round}, each player may broadcast a message to all other players.
+A round may take place at any predefined time step, and is assumed not to cause
+any delay to the players, nor consume any time steps.
+While we do not restrict the size (in bits) of each message, in a reasonable implementation a message should not be larger than $\O(n)$ bits.
+
+We introduce the notation $\Del_i := p_1 - p_i$ to denote the suboptimality gap of arm $i$, and occasionally use $\Delst := \Del_2$ for denoting the minimal gap. In the best-arm version of the problem, where we assume that the best arm is unique, we have $\Del_i > 0$ for all $i$.
+When dealing with the $(\eps,\del)$-PAC setup, we also consider the truncated gaps $\Dele_i := \max\{\Del_i,\eps\}$.
+In this work, we are interested in deriving distribution-dependent bounds over the sample complexity of algorithms. Namely, our bounds are stated as a function of $\eps,\del$ and also the distribution-specific values  $\Del := (\Del_2,\ldots,\Del_n)$%
+\footnote{If one is interested in distribution-free bounds, then the problem at hand is trivial as the (one-round) uniform sampling strategy is optimal in this setting (up to poly-logarithmic factors); see also \cite{mannor04} for a discussion.}. 
+%%Note, however, that our algorithms do \emph{not} require any distribution-specific parameters.
+The $\tO$ notation in our sample complexity bounds hides poly-logarithmic factors in $n,k,\eps,\del$ and $\Del_2,\ldots,\Del_n$.
+
+Clearly, a multi-player problem with $k=1$ players is just the standard exploratory MAB problem.
+When $k > 1$, the problem becomes more challenging as we constrain the communication between the players.
+In the rest of the section we review relevant results known in the single-player case, and give an overview of our results for the $k$-player MAB setting.
+
+
+
+
+
+%When discussing distributed, $k$-player algorithms, we will generally assume that the algorithms distribute the budget of arm pulls evenly between the players (up to rounding effects). Otherwise, an algorithm might just allocate all arm pulls to a single player, making the entire setting useless.
+%Equivalently, we can redefine the sample complexity of a distributed algorithm as follows:
+%
+%\begin{definition}
+%The sample complexity of a distributed, $k$-player algorithm is $k$ times the maximal number of arm pulls of any of the players.
+%That is, if we let $T_i$ denote the number of pulls the algorithm allocates to player $i=1,\ldots,k$, then the sample complexity of the algorithm is given by $T := k \cdot \max_{i} T_i$.
+%\end{definition}
+
+
+
+\subsection{Pure Exploration in Multi-Armed Bandits}
+
+%\subsection{The Successive Elimination algorithm}
+
+Most state-of-the-art algorithms for exploration in MAB, including the \emph{Successive Elimination} \cite{evendar06} and \emph{Successive Rejects} \cite{audibert10} algorithms, are based on sequential elimination of suboptimal arms. 
+Once an arm is eliminated, it is never pulled again and resources are directed towards the remaining arms.
+
+The Successive Elimination (SE) algorithm, 
+given $\eps$ and a target confidence $1-\del$, works in phases, each of which consists of uniform sampling of the remaining arms, followed by some elimination of the ``worst'' arms; see Algorithm~3 of \citet{evendar06}.
+%The classic MAB problem was first considered under the PAC model by \citet{evendar02}, who proposed the \emph{Successive Elimination} (SE) strategy for $\eps$-best arm identification. This state-of-the-art algorithm, as the more recent \emph{Successive Rejects} algorithm \citep{audibert10}, is based on sequential elimination of suboptimal arms.
+%Given $\eps$ and a target confidence $1-\del$, the algorithm works in phases, each of which consists of uniform sampling of the remaining arms, followed by some elimination of the ``worst'' arms; see Algorithm~3 of \citet{evendar06}.
+The SE algorithm enjoys the following sample complexity upper bound.
+
+
+
+%Following \cite{evendar06,audibert10}, we focus on elimination-based algorithms. Such algorithms work in phases, each of which consists of uniform sampling of the remaining arms, followed by some elimination of the ``worst'' arms.
+%Specifically, the \emph{Successive Elimination} (SE) strategy of \cite{evendar06} plays an important role in the derivation of our results.
+%\tk{should include pseudo-code of SE?}
+
+
+%\begin{lemma} %\label{lem:sebound}
+%\tk{eps-free version of the lemma -- unneeded?}
+%With probability at least $1-\del$, the \emph{\texttt{SE}$(\del)$} algorithm needs at most
+%\begin{align*}
+%	\OO{
+%		\sum_{i=2}^{n} \frac{1}{\Del_i^2} \log \frac{n}{\del \Del_i}
+%	}
+%\end{align*}
+%arm pulls for terminating and identifying the optimal arm correctly.
+%\end{lemma}
+
+
+\begin{theorem}[\citealt{evendar06}, Theorem~8] \label{thm:sebound}
+With probability at least $1-\del$, the Successive Elimination algorithm $\emph{\texttt{SE}}(\eps,\del)$ needs at most
+\begin{align} \label{eq:se_bound}
+	\OO{
+		\sum_{i=2}^{n} \frac{1}{(\Dele_i)^2} \log \frac{n}{\del \Dele_i}
+	}
+\end{align}
+arm pulls for terminating and identifying an $\eps$-best arm.
+\end{theorem}
+
+The above result is essentially tight (up to poly-logarithmic factors), as implied by Theorem~5 of \citet{mannor04}.
+Intuitively, the hardness of the task is therefore captured by the quantity
+\begin{align} \label{eq:H}
+	H_\eps :=
+	\sum_{i=2}^{n} \frac{1}{(\Dele_i)^2} \,,
+\end{align}
+which is roughly the number of arm pulls needed to find an $\eps$-best arm with a reasonable probability; see also \cite{audibert10} for a discussion.
+
+
+
+
+\subsection{Summary of Our Results}
+
+%We reconsider the explorative MAB problem in the distributed $k$-player setup, and provide bounds on the sample complexity of algorithms under various restrictions on the communication between the players.
+Our results are summarized in Table~\ref{tab:results} below, which compares the different algorithms on both the sample complexity and communication fronts.
+As a baseline for evaluating our results, we consider two trivial methods. In the first (``1P baseline''), the $k$-players simulate the centralized SE strategy with confidence $\del$, thus communicating upon each time step.
+In the second approach (``$k$P na\"ive'') each player independently executes SE with target confidence $\del/k$, which ensures that with probability $1-\del$ all players find an $\eps$-best arm but pays an $\tO(k)$ factor in the sample complexity.
+
+
+%cellspace defs
+\setlength{\cellspacetoplimit}{2pt}
+\setlength{\cellspacebottomlimit}{2pt}
+
+\begin{table}[htdp]
+\begin{center}
+\begin{tabular}{|l||Sc|Sl|}
+\hline
+Algorithm & Sample Comp. & Communication  \\
+\hline\hline
+1P baseline & $\tO(H_\eps)$ & every time step \\
+\hline
+$k$P na\"ive & $\tO(k \, H_\eps)$ & none \\
+\hline
+Alg.~\ref{alg:oneround},\ref{alg:oneround_eps} & $\tO(\sqrt{k} \, H_\eps)$ & $1$ round \\
+\hline
+Alg.~\ref{alg:algname} & $\tO(H_\eps)$ & $\O(\log \tfrac{1}{\eps})$ rounds \\
+\hline
+Alg.~\ref{alg:algname}' & $\tO(\eps^{-2/r} \, H_\eps)$ & $r$ rounds \\
+\hline
+\end{tabular}
+\end{center}
+\caption{Summary of our results.} \label{tab:results}
+\end{table}
+
+Our first algorithmic result (Algorithm~\ref{alg:oneround}) deals with the case where only one round of communication is allowed, and shows an $\tO(\sqrt{k} \, H_0)$ upper bound on the number of pulls required for best-arm identification, thus improving upon the na\"{i}ve approach by a $\sqrt{k}$ factor.
+We then extend this result to the $(\eps,\del)$-PAC setup (in Algorithm~\ref{alg:oneround_eps}), establishing an $\tO(\sqrt{k} \, H_\eps)$ upper bound for the one-round case.
+We complement these results with a lower bound, showing that in general it is
+impossible to lower the $\sqrt{k}$ gap between the sample complexity
+of single-player and one-round $k$-player algorithms.
+
+%\rl{if the new notation $H_\eps$ is only used in Table 1, please avoid it and just use the $H(\Del,\eps)$ notation.} \tk{OK, fixed}
+%\rl{Also regarding Table 1: the result in the first row is only valid if players can pull and communicate in a round robin fashion rather than pull simultaneously; see comment at beginning of section.} \tk{that was the idea, should be made clear in the description of the model.}
+
+We then relax the communication constraint and allow multiple
+communication rounds to take place.
+We show that $k$ players can reproduce the optimal $\tO(H_\eps)$ bound achievable in the single-player setup, using only $\log_2(1/\eps) + O(1)$ rounds.
+A rather simple modification of this result yields an algorithm that uses at most $r$ rounds and $\tO(\eps^{-2/r} \, H_\eps)$ arm pulls overall, for any positive integer $r$.
+
+
+%\tk{remark?: our results in section~\ref{sec:multiplerounds} also apply when each of player has its own set of arms, and we would like to perform well w.r.t.~the joint mixture.} -- not relevant for now.
+
+
+
+
+
+%The first result in this note is a simple algorithm for identifying the best arm in a MAB problem, that with high probability, identifies the optimal arm after $\O(\log(1/\Del))$ rounds and a total of
+%\begin{align*}
+%	\OO{\sum_{i=2}^{n}
+%		\frac{1}{\Del_i^2} \log \left(\frac{n}{\del} \log \frac{1}{\Del_i}\right)
+%	}
+%\end{align*}
+%arm pulls. This improves over the Successive Elimination (SE) and the Successive Rejects (SR) algorithms \citep{evendar06,audibert10} on both fronts, reducing the number of required rounds considerably and slightly improving the overall sample complexity. 
+%
+%A rather simple adaptation of the above algorithm allows us to restrict the number of rounds to no more than some predefined value $R$, albeit requiring knowing $\Del$ (or some lower bound thereof) for accomplishing that. Given $R$ and $\Del$, the latter algorithm terminates after at most $R$ rounds, and a total number of 
+%\begin{align*}
+%	\OO{
+%		\frac{1}{\Del^{2/R}}
+%		\cdot
+%		\sum_{i=2}^{n} \frac{1}{\Del_i^2}
+%		\log \frac{n R}{\del}
+%	}
+%\end{align*}
+%arm pulls. This implies a cost of $\O(\Del^{-2/R})$ times more pulls for reducing the number of rounds to a constant number.
+
+
+\input{singleround}
+\input{multiplerounds}
+\input{conc.tex}
+
+
+
+\bibliographystyle{plainnat}
+\bibliography{dmab}
+
+
+% begin conf. omission
+\ifdefined\isconf
+\else
+
+%\newpage
+\appendix
+
+\section{Proofs of Lemmas in Section \ref{sec:singleround}}
+
+For the proofs in this section, we need some additional notation.
+For any player $j$, let $i^\st_j$ denote the best arm in $A_j$, with ties broken arbitrarily. 
+Let $\Del^\st_j := \Del_{i^\st_j} = \min_{i \in A_j} \Del_i$ and $\Del_{i,j} := \max\{ \Del_i - \Del_j^\st, \eps \}$ for all $i \in A_j$.
+Finally, define
+\begin{align*}
+	H
+	:= \sum_{i^\st \ne i \in [n]}
+		\frac{1}{(\Del_i^{2\eps})^2} \ln \frac{6n}{\Del_i^{2\eps}}
+\end{align*}
+and
+\begin{align*}
+	H_j^{\text{local}}
+	&:= \sum_{i^\st_j \ne i \in A_j}
+		\frac{1}{\Del_{i,j}^2} \ln \frac{3n}{\Del_{i,j}^2}
+	\;,\\
+	H_j^{\text{global}}
+	&:= \sum_{i^\st_j \ne i \in A_j}
+		\frac{1}{(\Del_i^{2\eps})^2} \ln \frac{6n}{\Del_i^{2\eps}}
+\end{align*}
+for all players $j$.
+
+
+
+
+\begin{proof}[Proof (of Lemma~\ref{lem:kexplore_eps2})]
+The proof is analogical to that of Lemma~\ref{lem:kexplore}.
+Let $i^\st$ be the best arm and let $j$ be a player that chose it. The funds required by player $j$ in order to succeed choosing an $\eps$-best arm with probability at least $2/3$ is at most
+$
+	H_j	:= \sum_{i^\st \ne i \in A_j}
+		(1/\Del_i^{\eps})^2 \ln (6n/\Del_i^{\eps})
+$.
+Given Eq.~\eqref{eq:T_eps}, $\E[H_j] \leq T/4$, meaning that by Markov $\Pr[H_j \le T/2] \geq 1/2$. Since the probability of choosing the best arm is $12/\sqrt{k}$ it follows that for any fixed player $j$, with probability at least $\tfrac{2}{3} \cdot \tfrac{1}{2} \cdot 12/\sqrt{k} = 4/\sqrt{k}$ the player identified an $\eps$-best arm.
+Thus, the probability that all of the players fail to identify an $\eps$-best arm is bounded by
+\begin{align*}
+	\left( 1- \tfrac{4}{\sqrt{k}} \right)^k
+	\le e^{-4\sqrt{k}}
+	< 1/6 \,,
+\end{align*}
+and the lemma follows.
+\end{proof}
+
+
+
+\begin{proof}[Proof (of Lemma~\ref{lem:kexplore_eps1})]
+For convenience, let $\alpha = 12/\sqrt{k}$ and note that by our assumptions $\alpha \le \tfrac{1}{2}$.
+Also, since we assume $\sqrt{k} \le n$ we have $n_{2\eps} \le \tfrac{1}{2}n$.
+
+Fix some player $j$ and let $X_{\eps}$ and $X_{2\eps}$ denote the number of $\eps$-best and $2\eps$-best arms chosen by this player, respectively. 
+Consider the event $B = \{X_{\eps} = X_{2\eps} = 1\}$ in which the player chooses \emph{exactly one} $\eps$-optimal arm but no other $2\eps$-optimal arm.
+The probability that this event occurs is
+\begin{align*}
+	\Pr[B]
+	&= \frac{n_{\eps} {n - n_{2\eps} \choose \alpha n - 1}}
+		{{n \choose \alpha n}}
+	= \alpha n_{\eps} \frac{{n - n_{2\eps} \choose \alpha n - 1}}
+		{{n-1 \choose \alpha n - 1}} \\
+	&\ge \alpha n_{\eps} \left( \tfrac{n - n_{2\eps} - \alpha n}{n-\alpha n} \right)^{\alpha n}
+	= \alpha n_{\eps} \left( 1 - \tfrac{n_{2\eps}}{n-\alpha n} \right)^{\alpha n} \\
+	&\ge \alpha n_{\eps} \left( 1 - \tfrac{2 n_{2\eps}}{n} \right)^{\alpha n} \\
+	\intertext{since $\alpha \le \tfrac{1}{2}$,}
+%		&\mbox{\qquad (since $\alpha \le \tfrac{1}{2}$)} \\
+	&\ge \alpha n_{\eps} \left( 1- 2 \alpha n_{2\eps} \right) \\
+	\intertext{since $(1-x)^a \ge 1-ax$ for $x \le 1$, and}
+%		&\mbox{($(1-x)^a \ge 1-ax$ for $x \le 1$)} \\
+	&\ge \tfrac{1}{2}\alpha n_{\eps} = 6 n_{\eps}/\sqrt{k} \\
+	\intertext{since $\alpha n_{2\eps} \le \frac{1}{4}$.}
+%		&\mbox{\qquad (since $\alpha n_{2\eps} \le \frac{1}{4}$)}
+\end{align*}
+
+On the other hand, given the event $B$, for player $j$ we have $\Del_j^\st \le \eps$ and $\Del_i \ge 2\eps$ for all $i \ne i_j^\st$.
+Consequently, $\Del_{i,j} \ge \tfrac{1}{2} \Del_i =  \tfrac{1}{2} \Del_i^{2\eps}$ for all $i \in A_j$.
+Hence,
+\begin{align*}
+	H_j^\text{local}
+	&= \sum_{i^\st_j \ne i \in A_j} \frac{1}{\Del_{i,j}^2} \ln \frac{3n}{\Del_{i,j}} \\
+	&\le 4 \sum_{i^\st_j \ne i \in A_j} \frac{1}{(\Del_i^{2\eps})^2} \ln \frac{6n}{\Del_i^{2\eps}}
+	= 4 \, H_j^\text{global}
+\end{align*}
+Denoting $\Del_{> 2\eps} := \{i \,:\, \Del_i > 2\eps\}$, we now have 
+\begin{align*}
+	\E[H_j^\text{local} \mid B]
+	&\le 4 \, \E[H_j^\text{global} \mid B] \\
+	&\le 4 \frac{12n}{\sqrt{k}} \cdot 
+		\frac{1}{\abs{\Del_{>2\eps}}} 
+			\sum_{i \in \Del_{>2\eps}} \frac{1}{\Del_i^2} \ln \frac{6n}{\Del_i} \\
+	&< \frac{50n}{\sqrt{k}} \cdot 
+		\frac{1}{n} \sum_{i \ne i^\st} \frac{1}{(\Del_i^{2\eps})^2} \ln \frac{6n}{\Del_i^{2\eps}} \\
+	&= \frac{50}{\sqrt{k}} H
+\end{align*}
+Markov's inequality now gives
+$
+	\Pr[H_j^\text{local} \le 100 H/\sqrt{k} \mid B]
+	\ge \tfrac{1}{2} ,
+$
+and together with $\Pr[B] \ge 6 n_{\eps} / \sqrt{k}$ we obtain that
+\begin{align*}
+	\Pr[B \mbox{ and } H_j^\text{local} \le 100 H/\sqrt{k} ]
+	\ge 3 n_{\eps} / \sqrt{k} \,.
+\end{align*}
+
+Continuing as in the proof of Lemma \ref{lem:kexplore}, we get that when \eqref{eq:T_eps} holds, with probability at least $2 n_{\eps} / \sqrt{k}$
+(i) $A_j$ contains an $\eps$-best arm which is the only $2\eps$-best arm in $A_j$, and
+(ii) player~$j$ successfully identifies an arm which is $\eps$-best with respect to the best arm in~$A_j$. 
+This implies that with probability at least $2 n_{\eps} / \sqrt{k}$, the arm $i_j$ selected by player $j$ is $\eps$-best.
+\end{proof}
+
+
+
+\begin{proof}[Proof (of Lemma~\ref{lem:estimates_eps})]
+Since each estimate $\phat_i$ is the empirical average of at least $t_i$ samples of arm $i$,
+Hoeffding's inequality gives
+\begin{align*}
+	\Pr[\abs{\phat_i - p_i} > \eps/2]
+	\le 2 \exp (-\eps^2 t_i/2)
+	\le 1/6n \,,
+\end{align*}
+and a union bound concludes the proof.
+\end{proof}
+
+
+
+\section{Proof of Theorem~\ref{thm:lb1}}
+
+Our proof for Theorem~\ref{thm:lb1} is based on a simple lower bound for the MAB problem, that follows directly from Lemma~5.1 of \cite{anthony1999neural}. 
+
+\begin{lemma} \label{lem:coin}
+Consider a MAB problem with two arms and rewards $\frac{1}{2} + \eps$, $\frac{1}{2} - \eps$.
+There exists a constant $c_0$ such that any algorithm that with probability at least $2/3$ identifies the best arm, needs at least $c_0 /\eps^2$ pulls in expectation.
+\end{lemma}
+
+
+
+\begin{proof}[Proof (of Theorem~\ref{thm:lb1})]
+Let $c_1 = \sqrt{c_0}/2$, where $c_0$ is the constant of Lemma \ref{lem:coin}.
+Consider a MAB instance over $n$ arms, with the rewards being a random
+permutation $\sigma$ of $\frac{1}{2} + \Del, \frac{1}{2} - \Del, 0, \ldots, 0$, where $\Del := 1/\sqrt{n}$.
+By Theorem~\ref{thm:sebound}, the Successive Elimination algorithm is able to identify the best arm in this setting with probability $2/3$ using at most $\tO(n + \Del^2) = \tO(n)$ arm pulls.
+
+Assume that the players follow some algorithm, each using no more than $c_1 n/\sqrt{k}$ pulls. Without loss of generality, we may assume that the sequence of rewards, as well as the internal random bits of the algorithm (if it is randomized), were drawn before the execution has started. We shall denote this sequence of random variables by $h$.
+
+First, fix some arbitrary sequence $h$. Let $T_{i,j}$ denote the number of times arm $i$ (in decreasing order of rewards) was pulled by player $j$, and $T_i$ denote the total number of pulls of arm $i$.
+Since the budget of each player is $c_1 n/\sqrt{k}$, we have $\Pr_\sigma[T_{1,j} > 0] \le c_1 / \sqrt{k}$ and consequently
+$
+	\E_\sigma[T_{1,j}]
+	\le \E_\sigma[T_{1,j} \mid T_{1,j} > 0] \cdot \Pr[T_{1,j} > 0]
+	\le c_1^2 n/k
+$
+for any player~$j$.
+Similarly, $\E_\sigma[T_{2,j}] \le c_1^2 n/k$ and we get that $\E_\sigma[T_1 + T_2] \le 2 c_1^2 n = 2 c_1^2 / \Del^2 < c_0 / \Del^2$.
+
+Since the above holds for any given sequence $h$, this implies that $\E_\sigma[\E_h[T_1 + T_2]] < c_0 / \Del^2$, which means that there exists a permutation $\sigma_0$ underwhich $\E_h[T_1 + T_2] < c_0 / \Del^2$.
+For the permutation $\sigma_0$ and its corresponding reward setting, the algorithm does not sample the top two arms enough (in expectation), and by Lemma \ref{lem:coin} it cannot succeed with probability $2/3$.
+\end{proof}
+
+
+\fi
+% end conf. omission
+
+
+\end{document}  
